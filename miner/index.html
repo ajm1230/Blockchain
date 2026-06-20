@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NodeVault Miner - Professional Mining Node</title>
+    <link rel="stylesheet" href="css/modern.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">⛏️</span>
+                <h1>NodeVault Miner</h1>
+            </div>
+            <div class="status">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Offline</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+        <div class="container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="nav">
+                    <div class="nav-section">
+                        <h3>Wallet</h3>
+                        <button class="nav-link active" data-page="wallet">💰 Wallet</button>
+                    </div>
+                    <div class="nav-section">
+                        <h3>Mining</h3>
+                        <button class="nav-link" data-page="mining">⛏️ Mining</button>
+                    </div>
+                    <div class="nav-section">
+                        <h3>Blockchain</h3>
+                        <button class="nav-link" data-page="chain">⛓️ Chain</button>
+                        <button class="nav-link" data-page="mempool">📦 Mempool</button>
+                    </div>
+                    <div class="nav-section">
+                        <h3>Network</h3>
+                        <button class="nav-link" data-page="nodes">🌐 Nodes</button>
+                        <button class="nav-link" data-page="tx">💸 Send</button>
+                    </div>
+                    <div class="nav-section">
+                        <h3>System</h3>
+                        <button class="nav-link" data-page="settings">⚙️ Settings</button>
+                        <button class="nav-link" data-page="logs">📄 Logs</button>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Wallet Page -->
+                <page id="walletPage" class="page active">
+                    <h2>Wallet Management</h2>
+                    
+                    <div id="walletSetup" class="card">
+                        <h3>Getting Started</h3>
+                        <p>Create or import a wallet to start mining</p>
+                        <div class="button-group">
+                            <button class="btn btn-primary" id="createWalletBtn">
+                                ✨ Create New Wallet
+                            </button>
+                            <button class="btn btn-secondary" id="importWalletBtn">
+                                📥 Import Private Key
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="walletInfo" class="card" style="display: none;">
+                        <h3>Your Wallet</h3>
+                        
+                        <div class="wallet-grid">
+                            <div class="stat-box">
+                                <label>Balance</label>
+                                <div class="balance-display">
+                                    <span id="balanceValue">0.00</span>
+                                    <span class="currency">BTC</span>
+                                </div>
+                            </div>
+
+                            <div class="stat-box">
+                                <label>Blocks Mined</label>
+                                <div class="stat-value" id="blocksMined">0</div>
+                            </div>
+
+                            <div class="stat-box">
+                                <label>Fees Earned</label>
+                                <div class="stat-value" id="feesEarned">0.00</div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <label>Wallet Address</label>
+                            <div class="copy-field">
+                                <input type="text" id="walletAddress" readonly>
+                                <button class="btn-icon" id="copyAddressBtn">📋</button>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <label>Public Key</label>
+                            <textarea id="publicKeyDisplay" readonly rows="3"></textarea>
+                        </div>
+
+                        <div class="info-section">
+                            <label>Private Key (Keep Secret!)</label>
+                            <div class="copy-field">
+                                <input type="password" id="privateKeyDisplay" readonly>
+                                <button class="btn-icon" id="togglePrivateBtn">👁️</button>
+                                <button class="btn-icon" id="copyPrivateBtn">📋</button>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <button class="btn btn-secondary" id="downloadRecoveryBtn">
+                                💾 Download Recovery File
+                            </button>
+                            <button class="btn btn-danger" id="resetWalletBtn">
+                                🔄 Reset Wallet
+                            </button>
+                        </div>
+                    </div>
+                </page>
+
+                <!-- Mining Page -->
+                <page id="miningPage" class="page">
+                    <h2>Mining Dashboard</h2>
+
+                    <div class="mining-grid">
+                        <!-- Control Card -->
+                        <div class="card">
+                            <h3>Mining Control</h3>
+                            <label class="toggle-label">
+                                <input type="checkbox" id="autoMineToggle">
+                                <span class="toggle"></span>
+                                Auto Mining
+                            </label>
+                            <div class="button-group">
+                                <button class="btn btn-success" id="startMineBtn">▶️ Start Mining</button>
+                                <button class="btn btn-danger" id="stopMineBtn" style="display:none;">⏹️ Stop Mining</button>
+                            </div>
+                        </div>
+
+                        <!-- Stats Card -->
+                        <div class="card">
+                            <h3>Mining Statistics</h3>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="label">Hash Rate</span>
+                                    <span class="value" id="hashRate">0 H/s</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Attempts</span>
+                                    <span class="value" id="attempts">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Nonce</span>
+                                    <span class="value" id="currentNonce">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="label">Time</span>
+                                    <span class="value" id="miningTime">0s</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mining Log -->
+                    <div class="card">
+                        <h3>Mining Log</h3>
+                        <div class="terminal" id="miningLog">
+                            <div class="log-line">[Ready] Mining system initialized</div>
+                        </div>
+                    </div>
+                </page>
+
+                <!-- Chain Page -->
+                <page id="chainPage" class="page">
+                    <h2>Blockchain</h2>
+
+                    <div class="chain-stats">
+                        <div class="stat-card">
+                            <span class="stat-label">Total Blocks</span>
+                            <span class="stat-number" id="totalBlocks">1</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Chain Length</span>
+                            <span class="stat-number" id="chainLength">1</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Transactions</span>
+                            <span class="stat-number" id="totalTxs">0</span>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Blocks</h3>
+                        <div class="table-container">
+                            <table id="blockTable">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Hash</th>
+                                        <th>Txs</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="blockTableBody">
+                                    <tr><td colspan="4">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </page>
+
+                <!-- Mempool Page -->
+                <page id="mempoolPage" class="page">
+                    <h2>Memory Pool</h2>
+
+                    <div class="card">
+                        <h3>Pending Transactions</h3>
+                        <button class="btn btn-secondary" id="refreshMempoolBtn">🔄 Refresh</button>
+                        <div class="table-container">
+                            <table id="mempoolTable">
+                                <thead>
+                                    <tr>
+                                        <th>From</th>
+                                        <th>To</th>
+                                        <th>Amount</th>
+                                        <th>Fee</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mempoolBody">
+                                    <tr><td colspan="4">No pending transactions</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </page>
+
+                <!-- Nodes Page -->
+                <page id="nodesPage" class="page">
+                    <h2>Network Nodes</h2>
+
+                    <div class="card">
+                        <h3>Online Nodes</h3>
+                        <button class="btn btn-secondary" id="refreshNodesBtn">🔄 Refresh</button>
+                        <div class="table-container">
+                            <table id="nodesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Node ID</th>
+                                        <th>Address</th>
+                                        <th>Chain</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nodesBody">
+                                    <tr><td colspan="4">Connecting...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </page>
+
+                <!-- Send TX Page -->
+                <page id="txPage" class="page">
+                    <h2>Send Transaction</h2>
+
+                    <div class="card">
+                        <h3>Create Transaction</h3>
+                        <form id="txForm" class="form">
+                            <div class="form-group">
+                                <label>Recipient Address</label>
+                                <input type="text" id="recipientAddr" placeholder="BC..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Amount (BTC)</label>
+                                <input type="number" id="txAmount" placeholder="0.00" min="0" step="0.01" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Fee (BTC)</label>
+                                <input type="number" id="txFee" placeholder="0.01" min="0" step="0.001" value="0.01">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">💸 Send Transaction</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h3>Transaction History</h3>
+                        <div class="table-container">
+                            <table id="historyTable">
+                                <thead>
+                                    <tr>
+                                        <th>To</th>
+                                        <th>Amount</th>
+                                        <th>Fee</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyBody">
+                                    <tr><td colspan="4">No transactions</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </page>
+
+                <!-- Settings Page -->
+                <page id="settingsPage" class="page">
+                    <h2>Settings</h2>
+
+                    <div class="card">
+                        <h3>Server Configuration</h3>
+                        <div class="form-group">
+                            <label>Server URL</label>
+                            <input type="text" id="serverUrl" placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label>Node ID</label>
+                            <div class="copy-field">
+                                <input type="text" id="nodeId" readonly>
+                                <button class="btn-icon" id="regenerateNodeBtn">🔄</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                    </div>
+
+                    <div class="card">
+                        <h3>About</h3>
+                        <p><strong>NodeVault Miner v1.0</strong></p>
+                        <p>Professional blockchain mining node with real proof-of-work consensus.</p>
+                        <p>Network: NodeVault Learning Blockchain</p>
+                        <p>Consensus: SHA-256 Proof-of-Work</p>
+                    </div>
+                </page>
+
+                <!-- Logs Page -->
+                <page id="logsPage" class="page">
+                    <h2>System Logs</h2>
+
+                    <div class="card">
+                        <div class="log-controls">
+                            <button class="btn btn-secondary" id="clearLogsBtn">🗑️ Clear</button>
+                            <button class="btn btn-secondary" id="downloadLogsBtn">💾 Download</button>
+                        </div>
+                        <div class="terminal" id="systemLogs">
+                            <div class="log-line">[INFO] System started</div>
+                        </div>
+                    </div>
+                </page>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/crypto.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/blockchain.js"></script>
+    <script src="js/mempool.js"></script>
+    <script src="js/mining.js"></script>
+    <script src="js/wallet.js"></script>
+    <script src="js/server.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
