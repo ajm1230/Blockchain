@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NodeVault Miner — Full Node</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<header class="topbar">
+    <div class="topbar-left">
+        <span class="brand-icon">⛏️</span>
+        <span class="brand-name">NodeVault Miner</span>
+    </div>
+    <div class="topbar-right">
+        <span class="net-dot" id="netDot"></span>
+        <span id="netText">Connecting…</span>
+        <span class="divider">|</span>
+        <span id="peerCount">0</span> peers
+    </div>
+</header>
+
+<!-- ============ LAYOUT ============ -->
+<div class="layout">
+
+    <!-- ============ SIDEBAR ============ -->
+    <nav class="sidebar" id="sidebar">
+        <button class="nav-item active" data-page="wallet">
+            <span class="nav-ico">👛</span><span class="nav-txt">Wallet</span>
+        </button>
+        <button class="nav-item" data-page="mining">
+            <span class="nav-ico">⛏️</span><span class="nav-txt">Mining</span>
+        </button>
+        <button class="nav-item" data-page="mempool">
+            <span class="nav-ico">📥</span><span class="nav-txt">Mempool</span>
+        </button>
+        <button class="nav-item" data-page="explorer">
+            <span class="nav-ico">⛓️</span><span class="nav-txt">Explorer</span>
+        </button>
+        <button class="nav-item" data-page="myblocks">
+            <span class="nav-ico">🧱</span><span class="nav-txt">My Blocks</span>
+        </button>
+        <button class="nav-item" data-page="send">
+            <span class="nav-ico">💸</span><span class="nav-txt">Send</span>
+        </button>
+        <button class="nav-item" data-page="peers">
+            <span class="nav-ico">🌐</span><span class="nav-txt">Peers</span>
+        </button>
+        <button class="nav-item" data-page="files">
+            <span class="nav-ico">🗂️</span><span class="nav-txt">File Explorer</span>
+        </button>
+        <button class="nav-item" data-page="repair">
+            <span class="nav-ico">🛠️</span><span class="nav-txt">Repair Center</span>
+        </button>
+        <button class="nav-item" data-page="settings">
+            <span class="nav-ico">⚙️</span><span class="nav-txt">Settings</span>
+        </button>
+        <button class="nav-item" data-page="console">
+            <span class="nav-ico">📟</span><span class="nav-txt">Console</span>
+        </button>
+    </nav>
+
+    <!-- ============ MOBILE BOTTOM NAV ============ -->
+    <nav class="bottom-nav" id="bottomNav">
+        <button class="bn-item active" data-page="wallet">👛</button>
+        <button class="bn-item" data-page="mining">⛏️</button>
+        <button class="bn-item" data-page="mempool">📥</button>
+        <button class="bn-item" data-page="explorer">⛓️</button>
+        <button class="bn-item" data-page="send">💸</button>
+        <button class="bn-item" data-page="more">☰</button>
+    </nav>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="content">
+
+        <!-- ===================== WALLET PAGE ===================== -->
+        <section class="page active" id="page-wallet">
+            <div class="page-head">
+                <h1>Wallet</h1>
+                <p>Create, import, or recover your node identity</p>
+            </div>
+
+            <!-- No wallet yet -->
+            <div class="panel" id="noWalletPanel">
+                <div class="empty-state">
+                    <div class="empty-icon">👛</div>
+                    <h3>No Wallet Found</h3>
+                    <p>Generate a new wallet or recover an existing one to begin</p>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" id="btnNewWallet">+ Create New Wallet</button>
+                        <button class="btn btn-outline" id="btnRecoverWallet">⟲ Recover From Key</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wallet exists -->
+            <div class="panel-grid" id="walletPanel" style="display:none">
+
+                <div class="panel balance-panel">
+                    <div class="balance-label">Total Balance</div>
+                    <div class="balance-amount"><span id="balVal">0.00000000</span> <span class="unit">BTC</span></div>
+                    <div class="balance-sub">
+                        <span id="balConfirmed">0 confirmed</span> ·
+                        <span id="balPending">0 pending</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Address</h3>
+                    <div class="copy-row">
+                        <input type="text" id="addrField" readonly>
+                        <button class="icon-btn" id="copyAddr" title="Copy">📋</button>
+                        <button class="icon-btn" id="showQr" title="QR Code">▦</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Public Key</h3>
+                    <textarea id="pubKeyField" readonly rows="3"></textarea>
+                    <button class="btn btn-sm btn-outline" id="copyPub">Copy Public Key</button>
+                </div>
+
+                <div class="panel">
+                    <h3>Private Key <span class="badge-warn">SECRET — NEVER SHARE</span></h3>
+                    <div class="copy-row">
+                        <input type="password" id="privKeyField" readonly>
+                        <button class="icon-btn" id="togglePriv" title="Show/Hide">👁️</button>
+                        <button class="icon-btn" id="copyPriv" title="Copy">📋</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Backup</h3>
+                    <p class="muted">Download your recovery file. Anyone with this file can access your funds.</p>
+                    <button class="btn btn-outline" id="downloadBackup">💾 Download Recovery File</button>
+                </div>
+
+                <div class="panel danger-panel">
+                    <h3>Danger Zone</h3>
+                    <p class="muted">Permanently remove this wallet from this device.</p>
+                    <button class="btn btn-danger" id="deleteWallet">🗑️ Delete Wallet</button>
+                </div>
+
+            </div>
+
+            <!-- QR Modal -->
+            <div class="modal-backdrop" id="qrModal">
+                <div class="modal">
+                    <button class="modal-x" data-close>×</button>
+                    <h3>Receive</h3>
+                    <canvas id="qrCanvas" width="220" height="220"></canvas>
+                    <p class="mono small" id="qrAddrText"></p>
+                </div>
+            </div>
+
+            <!-- Create Wallet Modal -->
+            <div class="modal-backdrop" id="createModal">
+                <div class="modal">
+                    <button class="modal-x" data-close>×</button>
+                    <h3>New Wallet Created</h3>
+                    <p class="muted">Save your private key now. It will not be shown again unless revealed manually.</p>
+                    <label>Private Key</label>
+                    <textarea readonly rows="3" id="newPrivShow"></textarea>
+                    <label>Address</label>
+                    <input type="text" readonly id="newAddrShow">
+                    <button class="btn btn-primary full" data-close>I've Saved It — Continue</button>
+                </div>
+            </div>
+
+            <!-- Recover Modal -->
+            <div class="modal-backdrop" id="recoverModal">
+                <div class="modal">
+                    <button class="modal-x" data-close>×</button>
+                    <h3>Recover Wallet</h3>
+                    <label>Paste Private Key</label>
+                    <textarea id="recoverInput" rows="3" placeholder="Paste your private key JSON here"></textarea>
+                    <button class="btn btn-primary full" id="confirmRecover">Recover Wallet</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ===================== MINING PAGE ===================== -->
+        <section class="page" id="page-mining">
+            <div class="page-head">
+                <h1>Mining</h1>
+                <p>Proof-of-work block creation</p>
+            </div>
+
+            <div class="panel-grid">
+
+                <div class="panel control-panel">
+                    <h3>Control</h3>
+                    <div class="mining-state" id="miningStateLabel">Idle</div>
+                    <label class="switch-row">
+                        <span>Auto-Mine</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoMineSwitch">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    <div class="btn-row">
+                        <button class="btn btn-success full" id="btnStartMine">▶ Start Mining</button>
+                        <button class="btn btn-danger full" id="btnStopMine" style="display:none">■ Stop Mining</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Live Stats</h3>
+                    <div class="stat-rows">
+                        <div class="stat-row"><span>Hash Rate</span><strong id="statHashRate">0 H/s</strong></div>
+                        <div class="stat-row"><span>Attempts</span><strong id="statAttempts">0</strong></div>
+                        <div class="stat-row"><span>Current Nonce</span><strong id="statNonce">0</strong></div>
+                        <div class="stat-row"><span>Elapsed</span><strong id="statElapsed">00:00:00</strong></div>
+                        <div class="stat-row"><span>Blocks Mined</span><strong id="statBlocksMined">0</strong></div>
+                        <div class="stat-row"><span>Fees Earned</span><strong id="statFeesEarned">0.00000000</strong></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h3>Network Difficulty</h3>
+                    <div class="stat-rows">
+                        <div class="stat-row"><span>Target</span><strong id="diffTarget">000…</strong></div>
+                        <div class="stat-row"><span>Avg Block Time</span><strong id="diffAvgTime">—</strong></div>
+                        <div class="stat-row"><span>Adjusts In</span><strong id="diffAdjustIn">2016 blocks</strong></div>
+                    </div>
+                </div>
+
+                <div class="panel full-col">
+                    <h3>Current Block Draft</h3>
+                    <div class="stat-rows">
+                        <div class="stat-row"><span>Height</span><strong id="draftHeight">—</strong></div>
+                        <div class="stat-row"><span>Previous Hash</span><strong class="mono" id="draftPrevHash">—</strong></div>
+                        <div class="stat-row"><span>Transactions Included</span><strong id="draftTxCount">0</strong></div>
+                        <div class="stat-row"><span>Total Fees</span><strong id="draftFees">0.00000000</strong></div>
+                    </div>
+                </div>
+
+                <div class="panel full-col">
+                    <h3>Mining Terminal</h3>
+                    <div class="terminal" id="miningTerminal">
+                        <div class="t-line">Ready. Click Start Mining.</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ===================== MEMPOOL PAGE ===================== -->
+        <section class="page" id="page-mempool">
+            <div class="page-head">
+                <h1>Mempool</h1>
+                <p>Transactions waiting to be mined, sorted by fee priority</p>
+            </div>
+
+            <div class="panel">
+                <div class="panel-bar">
+                    <span><strong id="mempoolCount">0</strong> pending transactions</span>
+                    <button class="btn btn-sm btn-outline" id="refreshMempool">⟳ Refresh</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>TXID</th><th>From</th><th>To</th><th>Amount</th><th>Fee</th><th>Priority</th></tr>
+                        </thead>
+                        <tbody id="mempoolBody">
+                            <tr><td colspan="6" class="empty-row">Mempool is empty</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== EXPLORER PAGE ===================== -->
+        <section class="page" id="page-explorer">
+            <div class="page-head">
+                <h1>Blockchain Explorer</h1>
+                <p>Full local ledger</p>
+            </div>
+
+            <div class="stat-cards">
+                <div class="stat-card"><span>Height</span><strong id="expHeight">0</strong></div>
+                <div class="stat-card"><span>Total Tx</span><strong id="expTxTotal">0</strong></div>
+                <div class="stat-card"><span>Chain Status</span><strong id="expValid" class="ok">Valid ✓</strong></div>
+                <div class="stat-card"><span>Last Block</span><strong id="expLastTime">—</strong></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-bar">
+                    <span>Blocks (newest first)</span>
+                    <button class="btn btn-sm btn-outline" id="validateChainBtn">🔍 Validate Chain</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Height</th><th>Hash</th><th>Prev Hash</th><th>Txs</th><th>Time</th><th></th></tr></thead>
+                        <tbody id="explorerBody">
+                            <tr><td colspan="6" class="empty-row">No blocks yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Block Detail Modal -->
+            <div class="modal-backdrop" id="blockModal">
+                <div class="modal wide">
+                    <button class="modal-x" data-close>×</button>
+                    <h3>Block Details</h3>
+                    <pre class="json-view" id="blockJsonView"></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== MY BLOCKS PAGE ===================== -->
+        <section class="page" id="page-myblocks">
+            <div class="page-head">
+                <h1>My Blocks</h1>
+                <p>Blocks you personally mined</p>
+            </div>
+            <div class="panel">
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Height</th><th>Hash</th><th>Nonce</th><th>Txs</th><th>Fees Earned</th><th>Time</th></tr></thead>
+                        <tbody id="myBlocksBody">
+                            <tr><td colspan="6" class="empty-row">You haven't mined any blocks yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== SEND PAGE ===================== -->
+        <section class="page" id="page-send">
+            <div class="page-head">
+                <h1>Send Transaction</h1>
+                <p>Broadcast a signed transaction to the network</p>
+            </div>
+
+            <div class="panel-grid">
+                <div class="panel">
+                    <h3>New Transaction</h3>
+                    <form id="sendForm">
+                        <label>Recipient Address</label>
+                        <input type="text" id="sendTo" placeholder="BC..." required>
+
+                        <label>Amount (BTC)</label>
+                        <input type="number" id="sendAmount" placeholder="0.00000000" step="0.00000001" min="0" required>
+
+                        <label>Fee (BTC) <span class="muted">— higher fee = faster confirmation</span></label>
+                        <input type="number" id="sendFee" placeholder="0.0001" step="0.00000001" min="0" value="0.0001">
+
+                        <div class="fee-presets">
+                            <button type="button" class="chip" data-fee="0">Free</button>
+                            <button type="button" class="chip" data-fee="0.0001">Slow</button>
+                            <button type="button" class="chip" data-fee="0.0005">Normal</button>
+                            <button type="button" class="chip" data-fee="0.001">Fast</button>
+                        </div>
+
+                        <div class="signature-preview" id="sigPreview" style="display:none">
+                            <label>Signature Preview</label>
+                            <div class="mono small" id="sigPreviewText"></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary full">Sign & Broadcast</button>
+                    </form>
+                </div>
+
+                <div class="panel">
+                    <h3>My Transaction History</h3>
+                    <div class="table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>To</th><th>Amount</th><th>Fee</th><th>Status</th></tr></thead>
+                            <tbody id="historyBody">
+                                <tr><td colspan="4" class="empty-row">No transactions sent yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== PEERS PAGE ===================== -->
+        <section class="page" id="page-peers">
+            <div class="page-head">
+                <h1>Network Peers</h1>
+                <p>Other nodes currently online</p>
+            </div>
+            <div class="panel">
+                <div class="panel-bar">
+                    <span><strong id="peerListCount">0</strong> nodes online</span>
+                    <button class="btn btn-sm btn-outline" id="refreshPeers">⟳ Refresh</button>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Node ID</th><th>Wallet</th><th>Chain Height</th><th>Latest Hash</th><th>Status</th></tr></thead>
+                        <tbody id="peersBody">
+                            <tr><td colspan="5" class="empty-row">No peers connected</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== FILE EXPLORER PAGE ===================== -->
+        <section class="page" id="page-files">
+            <div class="page-head">
+                <h1>File Explorer</h1>
+                <p>Raw view of your local node storage</p>
+            </div>
+            <div class="panel-grid file-explorer-grid">
+                <div class="panel tree-panel">
+                    <h3>Blockchain/</h3>
+                    <ul class="file-tree" id="fileTree"></ul>
+                </div>
+                <div class="panel">
+                    <h3>File Content</h3>
+                    <pre class="json-view" id="fileContent">Select a file to view its contents</pre>
+                    <div class="btn-row" id="fileEditActions" style="display:none">
+                        <button class="btn btn-sm btn-outline" id="editFileBtn">✎ Edit</button>
+                        <button class="btn btn-sm btn-success" id="saveFileBtn" style="display:none">💾 Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== REPAIR CENTER PAGE ===================== -->
+        <section class="page" id="page-repair">
+            <div class="page-head">
+                <h1>Repair Center</h1>
+                <p>Tamper detection and ledger recovery</p>
+            </div>
+
+            <div class="panel" id="tamperStatusPanel">
+                <h3>Ledger Status</h3>
+                <div class="tamper-status ok" id="tamperStatus">
+                    <span class="t-icon">✓</span>
+                    <span id="tamperStatusText">Ledger integrity verified — no tampering detected</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Manual Repair Steps</h3>
+                <p class="muted">If tampering is detected, follow these steps in order.</p>
+                <div class="repair-steps">
+                    <div class="repair-step">
+                        <span class="step-num">1</span>
+                        <div>
+                            <strong>Go Offline</strong>
+                            <p class="muted">Disconnect from the network before repairing</p>
+                        </div>
+                        <button class="btn btn-sm btn-outline" id="repairOfflineBtn">Go Offline</button>
+                    </div>
+                    <div class="repair-step">
+                        <span class="step-num">2</span>
+                        <div>
+                            <strong>Delete Corrupted Ledger</strong>
+                            <p class="muted">Wipe your local blockchain copy</p>
+                        </div>
+                        <button class="btn btn-sm btn-danger" id="repairDeleteBtn" disabled>Delete Ledger</button>
+                    </div>
+                    <div class="repair-step">
+                        <span class="step-num">3</span>
+                        <div>
+                            <strong>Download From Peers</strong>
+                            <p class="muted">Fetch and compare ledgers from all online peers</p>
+                        </div>
+                        <button class="btn btn-sm btn-outline" id="repairDownloadBtn" disabled>Download & Compare</button>
+                    </div>
+                    <div class="repair-step">
+                        <span class="step-num">4</span>
+                        <div>
+                            <strong>Go Online</strong>
+                            <p class="muted">Reconnect and rejoin the network</p>
+                        </div>
+                        <button class="btn btn-sm btn-success" id="repairOnlineBtn" disabled>Go Online</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== SETTINGS PAGE ===================== -->
+        <section class="page" id="page-settings">
+            <div class="page-head">
+                <h1>Settings</h1>
+                <p>Node configuration</p>
+            </div>
+
+            <div class="panel-grid">
+                <div class="panel">
+                    <h3>Server Connection</h3>
+                    <label>Server URL</label>
+                    <input type="text" id="settingServerUrl">
+                    <label>Node ID</label>
+                    <div class="copy-row">
+                        <input type="text" id="settingNodeId" readonly>
+                        <button class="icon-btn" id="regenNodeId">⟲</button>
+                    </div>
+                    <button class="btn btn-primary" id="saveSettingsBtn">Save</button>
+                </div>
+
+                <div class="panel">
+                    <h3>Mining Reward Address</h3>
+                    <label class="radio-row">
+                        <input type="radio" name="rewardDest" value="own" checked> Send to my own wallet
+                    </label>
+                    <label class="radio-row">
+                        <input type="radio" name="rewardDest" value="custom"> Send to custom address
+                    </label>
+                    <input type="text" id="customRewardAddr" placeholder="BC..." style="display:none">
+                    <button class="btn btn-primary" id="saveRewardBtn">Save</button>
+                </div>
+
+                <div class="panel">
+                    <h3>Network Mode</h3>
+                    <label class="switch-row">
+                        <span>Online</span>
+                        <label class="switch">
+                            <input type="checkbox" id="onlineSwitch" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                    <p class="muted">Going offline disables broadcasting and syncing</p>
+                </div>
+
+                <div class="panel">
+                    <h3>About</h3>
+                    <div class="stat-rows">
+                        <div class="stat-row"><span>Version</span><strong>1.0.0</strong></div>
+                        <div class="stat-row"><span>Consensus</span><strong>Proof-of-Work</strong></div>
+                        <div class="stat-row"><span>Hash Algorithm</span><strong>SHA-256</strong></div>
+                        <div class="stat-row"><span>Fork Rule</span><strong>Longest Valid Chain</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== CONSOLE PAGE ===================== -->
+        <section class="page" id="page-console">
+            <div class="page-head">
+                <h1>Console</h1>
+                <p>System logs</p>
+            </div>
+            <div class="panel">
+                <div class="panel-bar">
+                    <span>Live Log</span>
+                    <div class="btn-row">
+                        <button class="btn btn-sm btn-outline" id="clearConsole">Clear</button>
+                        <button class="btn btn-sm btn-outline" id="downloadConsole">Download</button>
+                    </div>
+                </div>
+                <div class="terminal tall" id="consoleTerminal">
+                    <div class="t-line">[INFO] Console ready</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<!-- ============ SCRIPTS ============ -->
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/qrcode.js"></script>
+<script src="js/blockchain.js"></script>
+<script src="js/mempool.js"></script>
+<script src="js/mining.js"></script>
+<script src="js/wallet.js"></script>
+<script src="js/network.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
